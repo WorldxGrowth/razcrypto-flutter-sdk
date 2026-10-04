@@ -1,9 +1,11 @@
 /// What to open. Use a publishable key + payment id (created on your server), or the payment's `checkout_url`.
 /// Never put a secret key (`sk_…`) in an app.
 class CheckoutOptions {
-  /// Publishable key + payment id. `payHost` = your gateway URL (no built-in default, so a domain move needs no
-  /// new app release — prefer [CheckoutOptions.fromCheckoutUrl], which needs no host at all).
-  CheckoutOptions({required String key, required String paymentId, required this.payHost, this.locale})
+  /// Official RazCrypto checkout host.
+  static const defaultPayHost = 'https://razcryptogateway.com';
+
+  /// Publishable key + payment id. `payHost` is optional (staging / self-hosted only); default [defaultPayHost].
+  CheckoutOptions({required String key, required String paymentId, this.payHost = defaultPayHost, this.locale})
     : key = key,
       paymentId = paymentId,
       checkoutUrl = null {

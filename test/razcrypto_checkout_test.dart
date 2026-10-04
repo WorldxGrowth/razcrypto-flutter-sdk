@@ -22,6 +22,7 @@ void main() {
     expect(() => CheckoutOptions(key: pk, paymentId: 'nope', payHost: 'https://pay.example'), throwsArgumentError);
     expect(() => CheckoutOptions(key: pk, paymentId: pay, payHost: 'http://evil.example'), throwsArgumentError);
     expect(() => CheckoutOptions.fromCheckoutUrl('https://pay.example/whatever'), throwsArgumentError);
+    expect(CheckoutOptions(key: pk, paymentId: pay).payOrigin, 'https://razcryptogateway.com'); // official host by default
   });
 
   test('bridge messages: only ours, success payload mapped', () {
