@@ -24,7 +24,7 @@ import 'package:razcrypto_checkout/razcrypto_checkout.dart';
 
 final result = await RazCryptoCheckout.open(
   context,
-  CheckoutOptions(key: 'pk_live_…', paymentId: paymentIdFromYourServer),
+  CheckoutOptions(key: 'pk_live_…', paymentId: paymentIdFromYourServer, payHost: 'https://pay.example.com'),
   // or: CheckoutOptions.fromCheckoutUrl(checkoutUrlFromYourServer)
 );
 

@@ -18,8 +18,8 @@ void main() {
   });
 
   test('refuses secret keys and bad input', () {
-    expect(() => CheckoutOptions(key: 'sk_live_${'a' * 24}', paymentId: pay), throwsArgumentError);
-    expect(() => CheckoutOptions(key: pk, paymentId: 'nope'), throwsArgumentError);
+    expect(() => CheckoutOptions(key: 'sk_live_${'a' * 24}', paymentId: pay, payHost: 'https://pay.example'), throwsArgumentError);
+    expect(() => CheckoutOptions(key: pk, paymentId: 'nope', payHost: 'https://pay.example'), throwsArgumentError);
     expect(() => CheckoutOptions(key: pk, paymentId: pay, payHost: 'http://evil.example'), throwsArgumentError);
     expect(() => CheckoutOptions.fromCheckoutUrl('https://pay.example/whatever'), throwsArgumentError);
   });

@@ -1,8 +1,9 @@
 /// What to open. Use a publishable key + payment id (created on your server), or the payment's `checkout_url`.
 /// Never put a secret key (`sk_…`) in an app.
 class CheckoutOptions {
-  /// Publishable key + payment id.
-  CheckoutOptions({required String key, required String paymentId, this.payHost = defaultPayHost, this.locale})
+  /// Publishable key + payment id. `payHost` = your gateway URL (no built-in default, so a domain move needs no
+  /// new app release — prefer [CheckoutOptions.fromCheckoutUrl], which needs no host at all).
+  CheckoutOptions({required String key, required String paymentId, required this.payHost, this.locale})
     : key = key,
       paymentId = paymentId,
       checkoutUrl = null {
@@ -10,11 +11,10 @@ class CheckoutOptions {
   }
 
   /// The `checkout_url` your server received when it created the payment.
-  CheckoutOptions.fromCheckoutUrl(String url, {this.locale}) : key = null, paymentId = null, checkoutUrl = url, payHost = defaultPayHost {
+  CheckoutOptions.fromCheckoutUrl(String url, {this.locale}) : key = null, paymentId = null, checkoutUrl = url, payHost = originOf(Uri.parse(url)) {
     _validateUrl(url);
   }
 
-  static const defaultPayHost = 'https://pay.razcryptogateway.com';
   static final _payId = RegExp(r'^pay_[0-9A-Za-z]{20}$');
   static final _pk = RegExp(r'^pk_(live|test)_[0-9A-Za-z]{16,}$');
 
