@@ -7,7 +7,7 @@ Open RazCrypto crypto checkout from your Flutter app. The customer sees the same
 
 Your app gets the result back.
 
-- **pub.dev (after release):** `razcrypto_checkout`
+- **pub.dev:** [`razcrypto_checkout`](https://pub.dev/packages/razcrypto_checkout)
 - **Platforms:** Android and iOS (`webview_flutter`)
 - **Keys:** client-side only, publishable key (`pk_…`). Your server creates the payment with its secret key.
 - **License:** MIT

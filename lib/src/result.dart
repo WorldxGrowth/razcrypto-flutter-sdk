@@ -8,7 +8,11 @@ sealed class CheckoutResult {
 /// Paid. `signature` = hex HMAC-SHA256(webhook signing secret, "payment_id|reference_id|status"); verify it on
 /// your server with a server SDK (`verifyCheckoutSignature`).
 final class CheckoutSuccess extends CheckoutResult {
-  const CheckoutSuccess({required this.paymentId, this.referenceId, this.status = 'paid', this.signature});
+  const CheckoutSuccess(
+      {required this.paymentId,
+      this.referenceId,
+      this.status = 'paid',
+      this.signature});
   final String paymentId;
   final String? referenceId;
   final String status;
@@ -52,9 +56,14 @@ class BridgeMessage {
   static BridgeMessage? parse(String raw) {
     try {
       final o = jsonDecode(raw);
-      if (o is! Map<String, dynamic> || o['source'] != 'razcrypto' || o['type'] is! String) return null;
+      if (o is! Map<String, dynamic> ||
+          o['source'] != 'razcrypto' ||
+          o['type'] is! String) {
+        return null;
+      }
       final p = o['payload'];
-      return BridgeMessage(o['type'] as String, p is Map<String, dynamic> ? p : const {});
+      return BridgeMessage(
+          o['type'] as String, p is Map<String, dynamic> ? p : const {});
     } on FormatException {
       return null;
     }
@@ -65,6 +74,9 @@ class BridgeMessage {
     return v is String && v.isNotEmpty ? v : null;
   }
 
-  CheckoutSuccess toSuccess() =>
-      CheckoutSuccess(paymentId: _s('payment_id') ?? '', referenceId: _s('reference_id'), status: _s('status') ?? 'paid', signature: _s('signature'));
+  CheckoutSuccess toSuccess() => CheckoutSuccess(
+      paymentId: _s('payment_id') ?? '',
+      referenceId: _s('reference_id'),
+      status: _s('status') ?? 'paid',
+      signature: _s('signature'));
 }

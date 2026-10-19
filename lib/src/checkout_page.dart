@@ -16,11 +16,14 @@ import 'result.dart';
 abstract final class RazCryptoCheckout {
   static const version = '1.0.0';
 
-  static Future<CheckoutResult> open(BuildContext context, CheckoutOptions options) async {
+  static Future<CheckoutResult> open(
+      BuildContext context, CheckoutOptions options) async {
     final r = await Navigator.of(
       context,
       rootNavigator: true,
-    ).push<CheckoutResult>(MaterialPageRoute(fullscreenDialog: true, builder: (_) => CheckoutPage(options: options)));
+    ).push<CheckoutResult>(MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => CheckoutPage(options: options)));
     return r ?? const CheckoutCancelled();
   }
 }
@@ -50,19 +53,27 @@ class _CheckoutPageState extends State<CheckoutPage> {
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setUserAgent('RazCryptoFlutter/${RazCryptoCheckout.version}')
       // The page calls window.RazCryptoNative.postMessage(json).
-      ..addJavaScriptChannel('RazCryptoNative', onMessageReceived: (m) => unawaited(_onMessage(m.message)))
+      ..addJavaScriptChannel('RazCryptoNative',
+          onMessageReceived: (m) => unawaited(_onMessage(m.message)))
       ..setNavigationDelegate(
         NavigationDelegate(
-          onPageFinished: (_) => mounted ? setState(() => _loading = false) : null,
+          onPageFinished: (_) =>
+              mounted ? setState(() => _loading = false) : null,
           onWebResourceError: (e) {
-            if (e.isForMainFrame == true && _success == null) _finish(CheckoutFailed('network_error', e.description));
+            if (e.isForMainFrame == true && _success == null) {
+              _finish(CheckoutFailed('network_error', e.description));
+            }
           },
           // Stay in the WebView only for the pay origin; wallet links (MetaMask, Trust, wc:, …) open outside.
           onNavigationRequest: (req) {
             final uri = Uri.tryParse(req.url);
             if (uri == null) return NavigationDecision.prevent;
-            if ((uri.scheme == 'https' || uri.scheme == 'http') && CheckoutOptions.originOf(uri) == _origin) return NavigationDecision.navigate;
-            unawaited(launchUrl(uri, mode: LaunchMode.externalApplication).catchError((_) => false));
+            if ((uri.scheme == 'https' || uri.scheme == 'http') &&
+                CheckoutOptions.originOf(uri) == _origin) {
+              return NavigationDecision.navigate;
+            }
+            unawaited(launchUrl(uri, mode: LaunchMode.externalApplication)
+                .catchError((_) => false));
             return NavigationDecision.prevent;
           },
         ),
@@ -73,14 +84,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
   Future<void> _onMessage(String raw) async {
     // Only listen while the WebView shows the pay origin.
     final current = await _web.currentUrl();
-    if (current == null || CheckoutOptions.originOf(Uri.parse(current)) != _origin) return;
+    if (current == null ||
+        CheckoutOptions.originOf(Uri.parse(current)) != _origin) {
+      return;
+    }
     final m = BridgeMessage.parse(raw);
     if (m == null) return;
     switch (m.type) {
       case 'success':
         _success = m.toSuccess();
       case 'status':
-        if (m.payload['status'] == 'confirming') _pending = CheckoutPending('${m.payload['payment_id'] ?? ''}');
+        if (m.payload['status'] == 'confirming') {
+          _pending = CheckoutPending('${m.payload['payment_id'] ?? ''}');
+        }
       case 'done':
         _finish(_success ?? m.toSuccess());
       case 'close':
@@ -101,7 +117,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
       final r = await _web.runJavaScriptReturningResult(
         "(function(){if(window.__razcryptoRequestClose){window.__razcryptoRequestClose();return 'asked';}return 'none';})()",
       );
-      if (!'$r'.contains('asked')) _finish(_pending ?? const CheckoutCancelled());
+      if (!'$r'.contains('asked')) {
+        _finish(_pending ?? const CheckoutCancelled());
+      }
     } on Object {
       _finish(_pending ?? const CheckoutCancelled());
     }
@@ -109,19 +127,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   @override
   Widget build(BuildContext context) => PopScope(
-    canPop: false,
-    onPopInvokedWithResult: (didPop, _) {
-      if (!didPop) unawaited(_back());
-    },
-    child: Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            WebViewWidget(controller: _web),
-            if (_loading) const Center(child: CircularProgressIndicator()),
-          ],
+        canPop: false,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) unawaited(_back());
+        },
+        child: Scaffold(
+          body: SafeArea(
+            child: Stack(
+              children: [
+                WebViewWidget(controller: _web),
+                if (_loading) const Center(child: CircularProgressIndicator()),
+              ],
+            ),
+          ),
         ),
-      ),
-    ),
-  );
+      );
 }
